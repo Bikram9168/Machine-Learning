@@ -23,7 +23,7 @@ print(df.info())
 print(df.isnull().sum())
 
 
-X=df[["AveRooms"]]
+X = df[["AveRooms", "AveBedrms", "Population"]]
 y= df["Price"]
 
 X_train ,X_test, y_train , y_test=train_test_split(
@@ -33,21 +33,14 @@ X_train ,X_test, y_train , y_test=train_test_split(
 model = LinearRegression()
 model.fit(X_train,y_train)
 
-
-
 y_pred = model.predict(X_test)
-
-# Evalution
 
 print("Mean Absolute Error: ", mean_absolute_error(y_test,y_pred))
 print("Mean Squared Error: ", mean_squared_error(y_test,y_pred))
 print("R2 Score: ", r2_score(y_test,y_pred))
-# # Visualize
 
-plt.scatter(X_test,y_test,colorizer='blue',label='Actual')
-plt.scatter(X_test,y_pred,colorizer='red',label='Predicted')
-plt.xlabel('Median Income')
-plt.ylabel('House Price')
-plt.title('Linear Regression: House Price Prediction')
-plt.legend()
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted House Prices")
 plt.show()
