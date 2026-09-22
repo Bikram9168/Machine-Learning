@@ -1,8 +1,9 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, roc_auc_score
 
 data = {
     "Study_Hours": [
@@ -43,9 +44,6 @@ data = {
 
 df = pd.DataFrame(data)
 
-print("Student Dataset:")
-print(df)
-
 X = df[
     [
         "Study_Hours",
@@ -58,6 +56,7 @@ X = df[
 ]
 
 y = df["Pass"]
+
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -65,6 +64,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42,
     stratify=y
 )
+
 scaler = StandardScaler()
 
 X_train_scaled = scaler.fit_transform(X_train)
@@ -74,18 +74,41 @@ model = LogisticRegression(max_iter=1000)
 
 model.fit(X_train_scaled, y_train)
 
-y_pred = model.predict(X_test_scaled)
+y_probability = model.predict_proba(X_test_scaled)[:, 1]
 
-print(f"Actual :{y_test.values}")
+fpr, tpr, thresholds = roc_curve(
+    y_test,
+    y_probability
+)
 
-print(f"Prediction :{y_pred}")
-print(f"Accuracy  : {accuracy_score(y_test, y_pred):.4f}")
-print(f"Precision : {precision_score(y_test, y_pred):.4f}")
-print(f"Recall    : {recall_score(y_test, y_pred):.4f}")
-print(f"F1 Score  : {f1_score(y_test, y_pred):.4f}")
+auc_score = roc_auc_score(
+    y_test,
+    y_probability
+)
 
-print("\nActual Values:")
-print(y_test.values)
+print(f"AUC Score: {auc_score:.4f}")
 
-print("\nPredicted Values:")
-print(y_pred)
+plt.figure(figsize=(8, 6))
+
+plt.plot(
+    fpr,
+    tpr,
+    label=f"Logistic Regression (AUC = {auc_score:.4f})"
+)
+plt.plot(
+    [0, 1],
+    [0, 1],
+    linestyle="--",
+    label="Random Classifier"
+)
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+
+plt.title("ROC Curve - Student Pass/Fail Prediction")
+
+plt.legend()
+
+plt.grid()
+
+plt.show()
