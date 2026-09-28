@@ -71,13 +71,10 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 model = LogisticRegression(max_iter=1000)
-
 model.fit(X_train_scaled, y_train)
-
 y_pred = model.predict(X_test_scaled)
 
 print(f"Actual :{y_test.values}")
-
 print(f"Prediction :{y_pred}")
 print(f"Accuracy  : {accuracy_score(y_test, y_pred):.4f}")
 print(f"Precision : {precision_score(y_test, y_pred):.4f}")
